@@ -700,6 +700,124 @@ function outstandingPanel(type) {
   };
 }
 
+/* ---------- 일계표 ---------- */
+panels['daily-report'] = {
+  title: '일계표',
+  render(el, ctx) {
+    let date = fmt.today();
+
+    const shiftDate = (days) => {
+      const d = new Date(date + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      date = [
+        d.getFullYear(),
+        String(d.getMonth() + 1).padStart(2, '0'),
+        String(d.getDate()).padStart(2, '0'),
+      ].join('-');
+    };
+
+    const draw = () => {
+      const rows = store.transactions
+        .filter((t) => t.date === date)
+        .sort((a, b) => (a.type === b.type ? a.id - b.id : a.type === 'sales' ? -1 : 1));
+
+      const sum = { salesSupply: 0, salesVat: 0, salesTotal: 0, received: 0, purchaseSupply: 0, purchaseVat: 0, purchaseTotal: 0, paidOut: 0 };
+      for (const t of rows) {
+        if (t.type === 'sales') {
+          sum.salesSupply += t.supply;
+          sum.salesVat += t.vat;
+          sum.salesTotal += t.total;
+          sum.received += t.paid;
+        } else {
+          sum.purchaseSupply += t.supply;
+          sum.purchaseVat += t.vat;
+          sum.purchaseTotal += t.total;
+          sum.paidOut += t.paid;
+        }
+      }
+
+      const lineSummary = (t) => {
+        const first = t.lines[0]?.name || '';
+        return t.lines.length > 1 ? `${first} 외 ${t.lines.length - 1}건` : first;
+      };
+
+      el.innerHTML = `
+        <div class="erp-panel">
+          <div class="erp-toolbar">
+            <span class="erp-toolbar__title">일계표</span>
+            <div class="erp-toolbar__actions">
+              <button class="erp-btn" data-act="prev">◀ 전일</button>
+              <button class="erp-btn" data-act="today">오늘</button>
+              <button class="erp-btn" data-act="next">익일 ▶</button>
+              <button class="erp-btn" data-act="print">인쇄</button>
+            </div>
+            <div class="erp-toolbar__filter">
+              <label>기준일 <input type="date" data-date value="${date}" /></label>
+            </div>
+          </div>
+          ${gridHtml({
+            columns: [
+              { label: 'No', width: '36px' },
+              { label: '구분', width: '52px' },
+              { label: '거래처' },
+              { label: '품목', width: '180px' },
+              { label: '공급가액', width: '110px' },
+              { label: '부가세', width: '96px' },
+              { label: '합계', width: '110px' },
+              { label: '수금/지급', width: '110px' },
+              { label: '잔액', width: '110px' },
+              { label: '비고', width: '120px' },
+            ],
+            rows: rows.map((t, i) => ({
+              id: t.id,
+              _cls: t.total - t.paid > 0 ? 'dg__row--highlight' : '',
+              cells: [
+                { html: String(i + 1), cls: 'dg__no' },
+                { html: t.type === 'sales' ? '매출' : '매입', cls: 'dg__center' },
+                { html: fmt.esc(store.companyName(t.companyId)) },
+                { html: fmt.esc(lineSummary(t)) },
+                { html: fmt.comma(t.supply), cls: 'dg__num' },
+                { html: fmt.comma(t.vat), cls: 'dg__num' },
+                { html: fmt.comma(t.total), cls: 'dg__num' },
+                { html: fmt.comma(t.paid), cls: 'dg__num' },
+                { html: fmt.comma(t.total - t.paid), cls: 'dg__num' },
+                { html: fmt.esc(t.memo) },
+              ],
+            })),
+            footer: [
+              { html: '합계', span: 4, cls: 'dg__center' },
+              { html: fmt.comma(sum.salesSupply + sum.purchaseSupply), cls: 'dg__num' },
+              { html: fmt.comma(sum.salesVat + sum.purchaseVat), cls: 'dg__num' },
+              { html: fmt.comma(sum.salesTotal + sum.purchaseTotal), cls: 'dg__num' },
+              { html: fmt.comma(sum.received + sum.paidOut), cls: 'dg__num' },
+              { html: fmt.comma(sum.salesTotal + sum.purchaseTotal - sum.received - sum.paidOut), cls: 'dg__num' },
+              { html: '' },
+            ],
+            emptyText: date + ' 거래 내역이 없습니다.',
+          })}
+          <div class="erp-statusbar">
+            <span class="erp-statusbar__sales">매출계 <strong>${fmt.won(sum.salesTotal)}</strong> (${rows.filter((t) => t.type === 'sales').length}건)</span>
+            <span>수금계 <strong>${fmt.won(sum.received)}</strong></span>
+            <span class="erp-statusbar__purchase">매입계 <strong>${fmt.won(sum.purchaseTotal)}</strong> (${rows.filter((t) => t.type === 'purchase').length}건)</span>
+            <span>지급계 <strong>${fmt.won(sum.paidOut)}</strong></span>
+          </div>
+        </div>`;
+
+      el.querySelector('[data-date]').addEventListener('change', (e) => {
+        if (e.target.value) { date = e.target.value; draw(); }
+      });
+      el.querySelector('[data-act="prev"]').addEventListener('click', () => { shiftDate(-1); draw(); });
+      el.querySelector('[data-act="next"]').addEventListener('click', () => { shiftDate(1); draw(); });
+      el.querySelector('[data-act="today"]').addEventListener('click', () => { date = fmt.today(); draw(); });
+      el.querySelector('[data-act="print"]').addEventListener('click', () => window.print());
+
+      bindRowSelect(el, () => {});
+    };
+
+    draw();
+  },
+};
+
 panels['sales-list'] = txnListPanel('sales');
 panels['sales-new'] = txnFormPanel('sales');
 panels['sales-receivables'] = outstandingPanel('sales');

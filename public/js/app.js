@@ -24,6 +24,10 @@
         { kind: 'purchase-payables', label: '미지급금' },
       ],
     },
+    {
+      label: '보고서',
+      items: [{ kind: 'daily-report', label: '일계표' }],
+    },
   ];
 
   const shell = document.getElementById('app');
