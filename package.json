@@ -1,13 +1,16 @@
 {
   "name": "panmae",
   "version": "1.0.0",
-  "description": "판매 관리 프로젝트",
+  "description": "매입·매출 관리 ERP (Railway MySQL)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "mysql2": "^3.14.1"
   },
   "license": "MIT"
 }

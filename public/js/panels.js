@@ -169,13 +169,17 @@ panels.companies = {
       el.querySelector('[data-act="edit"]').addEventListener('click', () => {
         if (selectedId) panels.companies.form(el, ctx, selectedId);
       });
-      el.querySelector('[data-act="del"]').addEventListener('click', () => {
+      el.querySelector('[data-act="del"]').addEventListener('click', async () => {
         if (!selectedId) return;
         if (confirm('선택한 거래처를 삭제하시겠습니까?')) {
-          store.removeCompany(selectedId);
-          selectedId = null;
-          draw();
-          ctx.refreshStatus();
+          try {
+            await store.removeCompany(selectedId);
+            selectedId = null;
+            draw();
+            ctx.refreshStatus();
+          } catch (err) {
+            alert(err.message);
+          }
         }
       });
     };
@@ -212,17 +216,21 @@ panels.companies = {
       </div>`;
 
     el.querySelector('[data-act="cancel"]').addEventListener('click', () => panels.companies.render(el, ctx));
-    el.querySelector('[data-act="save"]').addEventListener('click', () => {
+    el.querySelector('[data-act="save"]').addEventListener('click', async () => {
       const f = el.querySelector('#company-form');
       const v = Object.fromEntries(new FormData(f).entries());
       if (!v.name.trim()) {
         el.querySelector('#form-error').textContent = '상호는 필수 입력입니다.';
         return;
       }
-      if (c) store.updateCompany(c.id, v);
-      else store.addCompany(v);
-      panels.companies.render(el, ctx);
-      ctx.refreshStatus();
+      try {
+        if (c) await store.updateCompany(c.id, v);
+        else await store.addCompany(v);
+        panels.companies.render(el, ctx);
+        ctx.refreshStatus();
+      } catch (err) {
+        el.querySelector('#form-error').textContent = err.message;
+      }
     });
   },
 };
@@ -297,12 +305,16 @@ panels.products = {
       el.querySelector('[data-act="edit"]').addEventListener('click', () => {
         if (selectedId) panels.products.form(el, ctx, selectedId);
       });
-      el.querySelector('[data-act="del"]').addEventListener('click', () => {
+      el.querySelector('[data-act="del"]').addEventListener('click', async () => {
         if (!selectedId) return;
         if (confirm('선택한 품목을 삭제하시겠습니까?')) {
-          store.removeProduct(selectedId);
-          selectedId = null;
-          draw();
+          try {
+            await store.removeProduct(selectedId);
+            selectedId = null;
+            draw();
+          } catch (err) {
+            alert(err.message);
+          }
         }
       });
     };
@@ -333,7 +345,7 @@ panels.products = {
       </div>`;
 
     el.querySelector('[data-act="cancel"]').addEventListener('click', () => panels.products.render(el, ctx));
-    el.querySelector('[data-act="save"]').addEventListener('click', () => {
+    el.querySelector('[data-act="save"]').addEventListener('click', async () => {
       const f = el.querySelector('#product-form');
       const v = Object.fromEntries(new FormData(f).entries());
       if (!v.code.trim() || !v.name.trim()) {
@@ -342,9 +354,13 @@ panels.products = {
       }
       v.purchasePrice = fmt.parseNum(v.purchasePrice);
       v.salesPrice = fmt.parseNum(v.salesPrice);
-      if (p) store.updateProduct(p.id, v);
-      else store.addProduct(v);
-      panels.products.render(el, ctx);
+      try {
+        if (p) await store.updateProduct(p.id, v);
+        else await store.addProduct(v);
+        panels.products.render(el, ctx);
+      } catch (err) {
+        el.querySelector('#form-error').textContent = err.message;
+      }
     });
   },
 };
@@ -451,13 +467,17 @@ function txnListPanel(type) {
         el.querySelector('[data-act="edit"]').addEventListener('click', () => {
           if (selectedId) ctx.openTab(type + '-new', { txnId: selectedId });
         });
-        el.querySelector('[data-act="del"]').addEventListener('click', () => {
+        el.querySelector('[data-act="del"]').addEventListener('click', async () => {
           if (!selectedId) return;
           if (confirm('선택한 전표를 삭제하시겠습니까?')) {
-            store.removeTxn(selectedId);
-            selectedId = null;
-            draw();
-            ctx.refreshStatus();
+            try {
+              await store.removeTxn(selectedId);
+              selectedId = null;
+              draw();
+              ctx.refreshStatus();
+            } catch (err) {
+              alert(err.message);
+            }
           }
         });
       };
@@ -604,7 +624,7 @@ function txnFormPanel(type) {
         el.querySelector('[data-act="save"]').addEventListener('click', save);
       };
 
-      const save = () => {
+      const save = async () => {
         const err = el.querySelector('#txn-error');
         if (!state.date) { err.textContent = '일자를 입력하세요.'; return; }
         if (!state.companyId) { err.textContent = '거래처를 선택하세요.'; return; }
@@ -632,11 +652,14 @@ function txnFormPanel(type) {
           memo: state.memo,
         };
 
-        if (editing) store.updateTxn(editing.id, payload);
-        else store.addTxn(payload);
-
-        ctx.refreshStatus();
-        ctx.openTab(type + '-list', {}, true);
+        try {
+          if (editing) await store.updateTxn(editing.id, payload);
+          else await store.addTxn(payload);
+          ctx.refreshStatus();
+          ctx.openTab(type + '-list', {}, true);
+        } catch (e) {
+          err.textContent = e.message;
+        }
       };
 
       draw();

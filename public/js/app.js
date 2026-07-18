@@ -218,5 +218,15 @@
     }
   });
 
-  renderAll(true);
+  (async () => {
+    workspaceEl.innerHTML = '<div class="erp-panel erp-panel--home"><p>데이터 불러오는 중…</p></div>';
+    try {
+      await store.reload();
+      renderAll(true);
+    } catch (err) {
+      workspaceEl.innerHTML = `<div class="erp-panel erp-panel--home"><p style="color:#c00">데이터 로드 실패: ${fmt.esc(err.message)}</p>
+        <p>Railway 앱 Variables에 MySQL Reference가 연결됐는지 확인하세요.</p>
+        <button class="erp-btn erp-btn--primary" type="button" onclick="location.reload()">다시 시도</button></div>`;
+    }
+  })();
 })();

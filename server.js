@@ -1,6 +1,8 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const db = require("./db");
+const api = require("./api");
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -17,19 +19,11 @@ const MIME = {
   ".ico": "image/x-icon",
 };
 
-const server = http.createServer((req, res) => {
-  const reqPath = decodeURIComponent(req.url.split("?")[0]);
+const server = http.createServer(async (req, res) => {
+  const reqPath = decodeURIComponent((req.url || "/").split("?")[0]);
 
-  if (reqPath === "/api/health") {
-    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-    res.end(
-      JSON.stringify({
-        status: "ok",
-        service: "panmae",
-        railway: Boolean(process.env.RAILWAY_ENVIRONMENT),
-        time: new Date().toISOString(),
-      }),
-    );
+  if (reqPath.startsWith("/api/")) {
+    await api.handle(req, res, reqPath);
     return;
   }
 
@@ -44,7 +38,6 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      // SPA fallback — 알 수 없는 경로는 index.html 반환
       fs.readFile(path.join(PUBLIC_DIR, "index.html"), (fbErr, fbData) => {
         if (fbErr) {
           res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
@@ -63,6 +56,24 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(`panmae 서버 실행 중: http://${HOST}:${PORT}`);
-});
+async function start() {
+  try {
+    const result = await db.init();
+    if (result.ok) {
+      console.log(
+        `[db] MySQL 연결 OK — ${result.host}/${result.database}` +
+          (result.seeded ? " (초기 데이터 삽입)" : ""),
+      );
+    } else {
+      console.warn("[db] MySQL 미연결:", result.error);
+    }
+  } catch (err) {
+    console.error("[db] 초기화 실패:", err.message);
+  }
+
+  server.listen(PORT, HOST, () => {
+    console.log(`panmae 서버 실행 중: http://${HOST}:${PORT}`);
+  });
+}
+
+start();
