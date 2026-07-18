@@ -1,0 +1,11 @@
+# Railway — panmae 단일 Node 서비스 (Nixpacks)
+# Root Directory 비움. 상세: RAILWAY.md
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"

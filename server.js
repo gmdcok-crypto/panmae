@@ -2,7 +2,8 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
 const PUBLIC_DIR = path.join(__dirname, "public");
 
 const MIME = {
@@ -17,7 +18,22 @@ const MIME = {
 };
 
 const server = http.createServer((req, res) => {
-  const urlPath = req.url === "/" ? "/index.html" : req.url;
+  const reqPath = decodeURIComponent(req.url.split("?")[0]);
+
+  if (reqPath === "/api/health") {
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        service: "panmae",
+        railway: Boolean(process.env.RAILWAY_ENVIRONMENT),
+        time: new Date().toISOString(),
+      }),
+    );
+    return;
+  }
+
+  const urlPath = reqPath === "/" ? "/index.html" : reqPath;
   const filePath = path.join(PUBLIC_DIR, path.normalize(urlPath));
 
   if (!filePath.startsWith(PUBLIC_DIR)) {
@@ -28,8 +44,16 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("파일을 찾을 수 없습니다.");
+      // SPA fallback — 알 수 없는 경로는 index.html 반환
+      fs.readFile(path.join(PUBLIC_DIR, "index.html"), (fbErr, fbData) => {
+        if (fbErr) {
+          res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+          res.end("파일을 찾을 수 없습니다.");
+          return;
+        }
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(fbData);
+      });
       return;
     }
 
@@ -39,6 +63,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`panmae 서버 실행 중: http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`panmae 서버 실행 중: http://${HOST}:${PORT}`);
 });
