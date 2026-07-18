@@ -1,0 +1,10 @@
+{
+  "name": "panmae",
+  "version": "1.0.0",
+  "description": "판매 관리 프로젝트",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT"
+}
