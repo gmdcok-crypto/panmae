@@ -1,0 +1,26 @@
+{
+  "name": "panmae ERP — 매입·매출 관리",
+  "short_name": "panmae",
+  "description": "매입·매출 관리 ERP 솔루션",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ece9d8",
+  "theme_color": "#2d5a8c",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,813 @@
+/* panmae ERP — C# WinForms / Excel 그리드 감성의 PC ERP 셸
+ * 디자인 토큰: css/tokens.css
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+  background: var(--erp-color-bg-shell);
+  font-family: var(--erp-font-family);
+  font-size: var(--erp-font-size-sm);
+  color: var(--erp-color-text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* ================= 셸 ================= */
+.erp-shell {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--erp-color-bg-shell);
+  overflow: hidden;
+}
+
+.erp-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ================= 사이드 트리 메뉴 ================= */
+.erp-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: var(--erp-sidebar-width);
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    var(--erp-color-sidebar-bg-top) 0%,
+    var(--erp-color-sidebar-bg-bottom) 100%
+  );
+  border-right: 1px solid var(--erp-color-border);
+  overflow: hidden;
+}
+
+.erp-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-weight: 700;
+  font-size: var(--erp-font-size-sm);
+  background: var(--erp-color-brand);
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--erp-color-brand-dark);
+}
+
+.erp-tree {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0;
+}
+
+.erp-tree__group {
+  margin-bottom: 2px;
+}
+
+.erp-tree__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  font-size: var(--erp-font-size-sm);
+  text-align: left;
+  cursor: pointer;
+  color: var(--erp-color-tree-text);
+  min-height: var(--erp-tree-item-min-height);
+}
+
+.erp-tree__item:hover {
+  background: var(--erp-color-tree-hover);
+}
+
+.erp-tree__item--active {
+  background: var(--erp-color-accent) !important;
+  color: #fff;
+}
+
+.erp-tree__item--parent-active {
+  font-weight: 600;
+  color: var(--erp-color-tree-parent);
+}
+
+.erp-tree__item--root {
+  font-weight: 600;
+  border-bottom: 1px solid var(--erp-color-tree-divider);
+  margin-bottom: 4px;
+}
+
+.erp-tree__item--branch {
+  font-weight: 600;
+}
+
+.erp-tree__item--leaf {
+  padding-left: var(--erp-tree-leaf-indent);
+  font-weight: 400;
+}
+
+.erp-tree__toggle {
+  width: var(--erp-tree-toggle-width);
+  font-size: var(--erp-font-size-toggle);
+  color: var(--erp-color-tree-toggle);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.erp-tree__item--active .erp-tree__toggle,
+.erp-tree__item--active .erp-tree__icon {
+  color: #fff;
+}
+
+.erp-tree__icon {
+  width: var(--erp-tree-icon-width);
+  flex-shrink: 0;
+  text-align: center;
+  color: var(--erp-color-tree-icon);
+}
+
+.erp-tree__label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.erp-tree__children {
+  border-left: 1px dotted var(--erp-color-tree-line);
+  margin-left: var(--erp-tree-line-margin);
+}
+
+/* ================= 탭 스트립 ================= */
+.erp-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: var(--erp-tab-height);
+  padding: 2px 4px 0;
+  background: var(--erp-color-tab-bg);
+  border-bottom: 1px solid var(--erp-color-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.erp-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.erp-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 10px;
+  background: var(--erp-color-tab-item);
+  border: 1px solid var(--erp-color-border);
+  border-bottom: none;
+  font-size: var(--erp-font-size-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 180px;
+}
+
+.erp-tab--active {
+  background: var(--erp-color-tab-active);
+  font-weight: 600;
+  position: relative;
+}
+
+.erp-tab--active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--erp-color-tab-active);
+}
+
+.erp-tab__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.erp-tab__close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--erp-color-tab-close);
+  font-size: var(--erp-font-size-tab-close);
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.erp-tab__close:hover {
+  color: var(--erp-color-tab-close-hover);
+}
+
+/* ================= 워크스페이스 ================= */
+.erp-workspace {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  background: var(--erp-color-bg-workspace);
+  overflow: hidden;
+}
+
+.erp-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.erp-panel--form {
+  background: var(--erp-color-bg-panel-form);
+}
+
+/* ================= 툴바 ================= */
+.erp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  background: linear-gradient(
+    180deg,
+    var(--erp-color-toolbar-top),
+    var(--erp-color-toolbar-bottom)
+  );
+  border-bottom: 1px solid var(--erp-color-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.erp-toolbar__title {
+  font-weight: 700;
+  font-size: var(--erp-font-size-sm);
+  min-width: var(--erp-toolbar-title-min-width);
+}
+
+.erp-toolbar__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.erp-toolbar__filter {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.erp-toolbar__filter label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--erp-font-size-xs);
+}
+
+.erp-toolbar__filter input,
+.erp-toolbar__filter select {
+  width: var(--erp-filter-input-width);
+  padding: 2px 4px;
+  border: 1px solid var(--erp-color-border-input);
+  font-size: var(--erp-font-size-sm);
+  background: var(--erp-color-bg-white);
+}
+
+.erp-toolbar__filter input[type='date'] {
+  width: 128px;
+}
+
+.erp-toolbar__filter select {
+  width: auto;
+  min-width: 90px;
+}
+
+/* ================= 버튼 ================= */
+.erp-btn {
+  padding: 2px 10px;
+  border: 1px solid var(--erp-color-border-button);
+  background: linear-gradient(180deg, var(--erp-color-btn-top), var(--erp-color-btn-bottom));
+  font-size: var(--erp-font-size-sm);
+  cursor: pointer;
+  min-height: var(--erp-btn-min-height);
+  border-radius: var(--erp-radius-none);
+}
+
+.erp-btn:hover:not(:disabled) {
+  border-color: var(--erp-color-accent);
+}
+
+.erp-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.erp-btn--primary {
+  background: linear-gradient(
+    180deg,
+    var(--erp-color-btn-primary-top),
+    var(--erp-color-btn-primary-bottom)
+  );
+  color: #fff;
+  border-color: var(--erp-color-brand-dark);
+}
+
+.erp-btn--danger {
+  color: var(--erp-color-text-danger);
+}
+
+.erp-btn--link {
+  border: none;
+  background: none;
+  color: var(--erp-color-text-link);
+  text-decoration: underline;
+}
+
+/* ================= 데이터 그리드 ================= */
+.dg-wrap {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--erp-color-bg-grid);
+}
+
+.dg-scroll {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.dg {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: var(--erp-font-size-sm);
+}
+
+.dg th,
+.dg td {
+  border: 1px solid var(--erp-color-border-grid);
+  padding: 1px 5px;
+  height: var(--erp-row-height);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dg thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    var(--erp-color-grid-header-top),
+    var(--erp-color-grid-header-bottom)
+  );
+  font-weight: 600;
+  text-align: left;
+  border-color: var(--erp-color-border);
+  box-shadow: 0 1px 0 var(--erp-color-border);
+  user-select: none;
+}
+
+.dg thead th.dg--sortable {
+  cursor: pointer;
+}
+
+.dg__no {
+  width: var(--erp-grid-no-width) !important;
+  text-align: center !important;
+  color: var(--erp-color-text-muted);
+  background: var(--erp-color-bg-grid-no);
+}
+
+.dg tbody tr {
+  cursor: default;
+}
+
+.dg tbody tr:hover {
+  background: var(--erp-color-row-hover);
+}
+
+.dg__row--selected {
+  background: var(--erp-color-accent) !important;
+  color: #fff;
+}
+
+.dg__row--selected:hover {
+  background: var(--erp-color-accent-hover) !important;
+}
+
+.dg__row--highlight {
+  background: var(--erp-color-bg-highlight-row);
+}
+
+.dg__empty {
+  text-align: center !important;
+  color: var(--erp-color-text-dim);
+  padding: 24px !important;
+  height: auto !important;
+}
+
+.dg__num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.dg__center {
+  text-align: center !important;
+}
+
+.dg tfoot td {
+  position: sticky;
+  bottom: 0;
+  background: var(--erp-color-bg-form-header);
+  font-weight: 700;
+  border-color: var(--erp-color-border);
+}
+
+.dg-footer {
+  padding: 3px 8px;
+  background: var(--erp-color-bg-statusbar);
+  border-top: 1px solid var(--erp-color-border);
+  font-size: var(--erp-font-size-xs);
+  flex-shrink: 0;
+}
+
+/* 편집 그리드 */
+.dg--edit .dg-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: var(--erp-font-size-sm);
+  padding: 0 2px;
+  height: 20px;
+}
+
+.dg--edit .dg-input:focus {
+  outline: 2px solid var(--erp-color-accent);
+  background: var(--erp-color-bg-white);
+}
+
+.dg--edit .dg-input:disabled {
+  color: var(--erp-color-text-muted);
+}
+
+.dg-input--num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dg-select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: var(--erp-font-size-sm);
+  height: 20px;
+}
+
+.dg__del {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--erp-color-text-dim);
+  font-size: var(--erp-font-size-tab-close);
+  padding: 0;
+  width: 100%;
+}
+
+.dg__del:hover {
+  color: var(--erp-color-tab-close-hover);
+}
+
+/* ================= 폼 ================= */
+.erp-form-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 6px 20px;
+  padding: 6px 12px;
+  background: var(--erp-color-bg-form-header);
+  border-bottom: 1px solid var(--erp-color-border-light);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.erp-form-header label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--erp-font-size-sm);
+  min-width: 0;
+}
+
+.erp-form-header label span {
+  color: var(--erp-color-text-secondary);
+  min-width: var(--erp-form-label-min-width);
+  flex-shrink: 0;
+}
+
+.erp-form-header input,
+.erp-form-header select {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 4px;
+  border: 1px solid var(--erp-color-border-input);
+  font-size: var(--erp-font-size-sm);
+  background: var(--erp-color-bg-white);
+}
+
+.erp-form-error {
+  padding: 4px 8px;
+  color: var(--erp-color-text-error);
+  background: var(--erp-color-bg-error);
+  border-top: 1px solid var(--erp-color-border-error);
+  font-size: var(--erp-font-size-sm);
+}
+
+.erp-form-error:empty {
+  display: none;
+}
+
+/* 카드형 등록 폼 */
+.erp-panel--card-form {
+  height: auto;
+  min-height: 100%;
+  overflow: auto;
+  align-items: flex-start;
+  padding: 12px;
+}
+
+.erp-form-card {
+  width: 100%;
+  max-width: 920px;
+  border: 1px solid var(--erp-color-border);
+  background: var(--erp-color-bg-white);
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-form-card__title {
+  padding: 6px 12px;
+  font-weight: 700;
+  background: linear-gradient(
+    180deg,
+    var(--erp-color-toolbar-top),
+    var(--erp-color-toolbar-bottom)
+  );
+  border-bottom: 1px solid var(--erp-color-border);
+}
+
+.erp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+  padding: 12px 14px;
+}
+
+.erp-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--erp-font-size-xs);
+}
+
+.erp-form-grid label span {
+  color: #444;
+  font-weight: 600;
+}
+
+.erp-form-grid input,
+.erp-form-grid select {
+  padding: 3px 5px;
+  border: 1px solid var(--erp-color-border-input);
+  font-size: var(--erp-font-size-sm);
+}
+
+.erp-form-grid__wide {
+  grid-column: span 3;
+}
+
+.erp-form-grid__half {
+  grid-column: span 2;
+}
+
+.erp-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--erp-color-border-light);
+  background: var(--erp-color-bg-form-header);
+}
+
+.dg-wrap--lines {
+  flex: 0 0 auto;
+  max-height: 300px;
+  border-top: 1px solid var(--erp-color-border);
+}
+
+/* ================= 상태바 / 푸터 ================= */
+.erp-statusbar {
+  display: flex;
+  gap: 20px;
+  padding: 4px 10px;
+  background: var(--erp-color-bg-statusbar);
+  border-top: 1px solid var(--erp-color-border);
+  font-size: var(--erp-font-size-sm);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.erp-statusbar strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.erp-statusbar__sales strong {
+  color: var(--erp-color-text-accent-sales);
+}
+
+.erp-statusbar__purchase strong {
+  color: var(--erp-color-text-accent-purchase);
+}
+
+.erp-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 8px;
+  background: var(--erp-color-bg-footer);
+  border-top: 1px solid var(--erp-color-border);
+  font-size: var(--erp-font-size-xs);
+  flex-shrink: 0;
+}
+
+/* ================= 홈 대시보드 ================= */
+.erp-panel--home {
+  padding: 16px 20px;
+  flex: 1;
+  overflow: auto;
+  display: block;
+}
+
+.erp-home-title {
+  font-size: var(--erp-font-size-md);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.erp-home-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.erp-home-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  min-width: 200px;
+  border: 1px solid var(--erp-color-border);
+  background: var(--erp-color-bg-white);
+}
+
+.erp-home-stat span {
+  font-size: var(--erp-font-size-sm);
+  color: var(--erp-color-text-secondary);
+}
+
+.erp-home-stat strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.erp-home-stat--sales strong {
+  color: var(--erp-color-text-accent-sales);
+}
+
+.erp-home-stat--purchase strong {
+  color: var(--erp-color-text-accent-purchase);
+}
+
+.erp-home-stat--danger strong {
+  color: var(--erp-color-text-danger);
+}
+
+.erp-home-stat small {
+  font-size: var(--erp-font-size-xs);
+  color: var(--erp-color-text-muted);
+}
+
+.erp-home-section {
+  margin-bottom: 20px;
+}
+
+.erp-home-section h3 {
+  font-size: var(--erp-font-size-sm);
+  margin-bottom: 6px;
+}
+
+.erp-home-section .dg-wrap {
+  flex: none;
+  border: 1px solid var(--erp-color-border);
+  max-height: 260px;
+}
+
+/* ================= 모바일 (PWA) ================= */
+.erp-sidebar__close,
+.erp-mobile-menu-btn {
+  display: none;
+  border: none;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.erp-mobile-menu-btn {
+  color: var(--erp-color-text);
+  padding: 0 8px;
+}
+
+.erp-sidebar__backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .erp-sidebar {
+    position: fixed;
+    z-index: 30;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    transition: transform 0.18s ease-out;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+  }
+
+  .erp-shell--menu-open .erp-sidebar {
+    transform: translateX(0);
+  }
+
+  .erp-shell--menu-open .erp-sidebar__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .erp-sidebar__close {
+    display: block;
+    margin-left: auto;
+  }
+
+  .erp-mobile-menu-btn {
+    display: block;
+  }
+
+  .erp-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .erp-form-grid__wide,
+  .erp-form-grid__half {
+    grid-column: span 1;
+  }
+
+  .erp-toolbar__filter {
+    margin-left: 0;
+    width: 100%;
+  }
+}

@@ -2,14 +2,51 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>panmae</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2d5a8c" />
+    <meta name="description" content="panmae — 매입·매출 관리 ERP" />
+    <title>panmae ERP — 매입·매출 관리</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/erp.css" />
   </head>
   <body>
-    <main>
-      <h1>panmae</h1>
-      <p>판매 관리 프로젝트에 오신 것을 환영합니다.</p>
-    </main>
+    <div id="app" class="erp-shell">
+      <div class="erp-sidebar__backdrop" data-action="close-menu"></div>
+
+      <aside class="erp-sidebar" id="sidebar">
+        <div class="erp-sidebar__brand">
+          <span>panmae ERP</span>
+          <button type="button" class="erp-sidebar__close" data-action="close-menu" aria-label="메뉴 닫기">×</button>
+        </div>
+        <nav class="erp-tree" id="tree-menu" aria-label="메뉴"></nav>
+      </aside>
+
+      <div class="erp-main">
+        <div class="erp-tabs" id="tab-strip"></div>
+        <div class="erp-workspace" id="workspace"></div>
+        <div class="erp-statusbar" id="statusbar"></div>
+        <div class="erp-footer">
+          <span>
+            <button type="button" class="erp-mobile-menu-btn" data-action="open-menu" aria-label="메뉴 열기">☰</button>
+            panmae ERP v1.0 — 매입·매출 관리
+          </span>
+          <span id="footer-clock"></span>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/format.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/panels.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js');
+        });
+      }
+    </script>
   </body>
 </html>

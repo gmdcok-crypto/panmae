@@ -1,0 +1,97 @@
+/**
+ * panmae ERP — Design Tokens
+ * D:\sales (Chick Sales ERP) 토큰 체계 계승. 색·간격·폰트는 반드시 이 변수로만 사용.
+ */
+:root {
+  /* Colors — Base */
+  --erp-color-text: #000000;
+  --erp-color-text-muted: #666666;
+  --erp-color-text-secondary: #333333;
+  --erp-color-text-dim: #888888;
+  --erp-color-text-link: #0066cc;
+  --erp-color-text-danger: #990000;
+  --erp-color-text-error: #cc0000;
+  --erp-color-text-balance: #0d5c2e;
+  --erp-color-text-accent-sales: #0d5c2e;
+  --erp-color-text-accent-purchase: #3730a3;
+
+  /* Colors — Surfaces */
+  --erp-color-bg-shell: #ece9d8;
+  --erp-color-bg-workspace: #f0f0f0;
+  --erp-color-bg-panel-form: #f0f0f0;
+  --erp-color-bg-white: #ffffff;
+  --erp-color-bg-grid: #ffffff;
+  --erp-color-bg-statusbar: #ece9d8;
+  --erp-color-bg-footer: #d6d3ce;
+  --erp-color-bg-form-header: #e8e8e8;
+  --erp-color-bg-grid-no: #f4f4f4;
+  --erp-color-bg-highlight-row: #fff8e6;
+  --erp-color-bg-error: #ffe8e8;
+
+  /* Colors — Sidebar */
+  --erp-color-sidebar-bg-top: #f4f4f4;
+  --erp-color-sidebar-bg-bottom: #e4e4e4;
+  --erp-color-brand: #2d5a8c;
+  --erp-color-brand-dark: #1e3f66;
+  --erp-color-tree-text: #222222;
+  --erp-color-tree-hover: #d8e8ff;
+  --erp-color-tree-parent: #1e3f66;
+  --erp-color-tree-toggle: #555555;
+  --erp-color-tree-icon: #666666;
+  --erp-color-tree-divider: #c8c8c8;
+  --erp-color-tree-line: #b0b0b0;
+
+  /* Colors — Accent / Interactive */
+  --erp-color-accent: #316ac5;
+  --erp-color-accent-hover: #2858a8;
+  --erp-color-row-hover: #e8f4ff;
+  --erp-color-border: #a0a0a0;
+  --erp-color-border-light: #c0c0c0;
+  --erp-color-border-grid: #d4d4d4;
+  --erp-color-border-input: #7f9db9;
+  --erp-color-border-button: #707070;
+  --erp-color-border-error: #ffaaaa;
+
+  /* Colors — Tabs */
+  --erp-color-tab-bg: #d6d3ce;
+  --erp-color-tab-item: #c0c0c0;
+  --erp-color-tab-active: #f0f0f0;
+  --erp-color-tab-close: #555555;
+  --erp-color-tab-close-hover: #cc0000;
+
+  /* Colors — Toolbar / Buttons */
+  --erp-color-toolbar-top: #fafafa;
+  --erp-color-toolbar-bottom: #e4e4e4;
+  --erp-color-btn-top: #ffffff;
+  --erp-color-btn-bottom: #e8e8e8;
+  --erp-color-btn-primary-top: #4a7fc1;
+  --erp-color-btn-primary-bottom: #2d5a8c;
+  --erp-color-grid-header-top: #f8f8f8;
+  --erp-color-grid-header-bottom: #e0e0e0;
+
+  /* Typography */
+  --erp-font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+  --erp-font-size-xs: 11px;
+  --erp-font-size-sm: 12px;
+  --erp-font-size-md: 13px;
+  --erp-font-size-toggle: 9px;
+  --erp-font-size-tab-close: 14px;
+
+  /* Spacing & Layout */
+  --erp-sidebar-width: 200px;
+  --erp-tab-height: 26px;
+  --erp-row-height: 22px;
+  --erp-btn-min-height: 22px;
+  --erp-tree-item-min-height: 24px;
+  --erp-tree-leaf-indent: 22px;
+  --erp-tree-line-margin: 14px;
+  --erp-tree-toggle-width: 14px;
+  --erp-tree-icon-width: 14px;
+  --erp-grid-no-width: 36px;
+  --erp-filter-input-width: 150px;
+  --erp-toolbar-title-min-width: 72px;
+  --erp-form-label-min-width: 52px;
+
+  /* Radius — WinForms style */
+  --erp-radius-none: 0;
+}
