@@ -222,6 +222,8 @@
     workspaceEl.innerHTML = '<div class="erp-panel erp-panel--home"><p>데이터 불러오는 중…</p></div>';
     try {
       await store.reload();
+      workspaceEl.innerHTML = '';
+      panelHosts.clear();
       renderAll(true);
     } catch (err) {
       workspaceEl.innerHTML = `<div class="erp-panel erp-panel--home"><p style="color:#c00">데이터 로드 실패: ${fmt.esc(err.message)}</p>
