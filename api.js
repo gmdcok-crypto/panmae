@@ -257,6 +257,16 @@ async function handle(req, res, pathname) {
     }
     if (companyMatch && req.method === "DELETE") {
       const id = Number(companyMatch[1]);
+      const [{ cnt }] = await db.query(
+        "SELECT COUNT(*) AS cnt FROM transactions WHERE company_id=?",
+        [id],
+      );
+      if (Number(cnt) > 0) {
+        sendJson(res, 409, {
+          error: `이 거래처의 전표 ${cnt}건이 있어 삭제할 수 없습니다. 전표를 먼저 삭제하세요.`,
+        });
+        return true;
+      }
       await db.query("DELETE FROM companies WHERE id=?", [id]);
       sendJson(res, 200, { ok: true });
       return true;

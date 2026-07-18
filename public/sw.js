@@ -1,5 +1,5 @@
 /* panmae ERP — Service Worker (오프라인 캐시) */
-const CACHE = 'panmae-erp-v3';
+const CACHE = 'panmae-erp-v4';
 const ASSETS = [
   './',
   './index.html',

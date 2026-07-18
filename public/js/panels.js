@@ -28,7 +28,7 @@ function gridHtml({ columns, rows, footer, emptyText }) {
     </div>`;
 }
 
-function bindRowSelect(container, onSelect) {
+function bindRowSelect(container, onSelect, onDblClick) {
   const tbody = container.querySelector('.dg tbody');
   if (!tbody) return;
   tbody.addEventListener('click', (e) => {
@@ -38,6 +38,12 @@ function bindRowSelect(container, onSelect) {
     tr.classList.add('dg__row--selected');
     onSelect(Number(tr.dataset.id), tr, e);
   });
+  if (onDblClick) {
+    tbody.addEventListener('dblclick', (e) => {
+      const tr = e.target.closest('tr[data-id]');
+      if (tr) onDblClick(Number(tr.dataset.id));
+    });
+  }
 }
 
 /* ---------- 홈 ---------- */
@@ -149,12 +155,16 @@ panels.companies = {
           })}
         </div>`;
 
-      bindRowSelect(el, (id) => { selectedId = id; syncButtons(); });
-
       const syncButtons = () => {
         el.querySelector('[data-act="edit"]').disabled = !selectedId;
         el.querySelector('[data-act="del"]').disabled = !selectedId;
       };
+
+      bindRowSelect(
+        el,
+        (id) => { selectedId = id; syncButtons(); },
+        (id) => panels.companies.form(el, ctx, id),
+      );
 
       el.querySelector('[data-filter]').addEventListener('input', (e) => {
         keyword = e.target.value.trim();
@@ -286,11 +296,15 @@ panels.products = {
           })}
         </div>`;
 
-      bindRowSelect(el, (id) => {
-        selectedId = id;
-        el.querySelector('[data-act="edit"]').disabled = false;
-        el.querySelector('[data-act="del"]').disabled = false;
-      });
+      bindRowSelect(
+        el,
+        (id) => {
+          selectedId = id;
+          el.querySelector('[data-act="edit"]').disabled = false;
+          el.querySelector('[data-act="del"]').disabled = false;
+        },
+        (id) => panels.products.form(el, ctx, id),
+      );
 
       el.querySelector('[data-filter]').addEventListener('input', (e) => {
         keyword = e.target.value.trim();
